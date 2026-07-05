@@ -18,7 +18,16 @@ app.innerHTML = `
       <div id="scene-container" class="scene-container"></div>
       <div class="viewer-status" id="viewer-status"></div>
     </section>
+    <div class="mobile-action-bar" aria-label="スマホ用操作">
+      <button id="mobile-menu-button" type="button">操作</button>
+      <button id="mobile-section-button" type="button">断面図</button>
+    </div>
+    <button id="drawer-backdrop" class="drawer-backdrop" type="button" aria-label="メニューを閉じる"></button>
     <aside class="side-panel">
+      <div class="drawer-header">
+        <span>メニュー</span>
+        <button id="drawer-close-button" type="button" aria-label="メニューを閉じる">閉じる</button>
+      </div>
       <section class="control-panel" aria-label="操作パネル">
         <div class="panel-heading">
           <p class="eyebrow">空間図形</p>
@@ -56,6 +65,12 @@ const sectionShapeName = document.querySelector<HTMLSpanElement>('#section-shape
 const readoutOffset = document.querySelector<HTMLElement>('#readout-offset');
 const readoutAngles = document.querySelector<HTMLElement>('#readout-angles');
 const sectionNote = document.querySelector<HTMLElement>('#section-note');
+const sidePanel = document.querySelector<HTMLElement>('.side-panel');
+const sectionPanel = document.querySelector<HTMLElement>('.section-panel');
+const mobileMenuButton = document.querySelector<HTMLButtonElement>('#mobile-menu-button');
+const mobileSectionButton = document.querySelector<HTMLButtonElement>('#mobile-section-button');
+const drawerBackdrop = document.querySelector<HTMLButtonElement>('#drawer-backdrop');
+const drawerCloseButton = document.querySelector<HTMLButtonElement>('#drawer-close-button');
 
 if (
   !sceneContainer ||
@@ -65,7 +80,13 @@ if (
   !sectionShapeName ||
   !readoutOffset ||
   !readoutAngles ||
-  !sectionNote
+  !sectionNote ||
+  !sidePanel ||
+  !sectionPanel ||
+  !mobileMenuButton ||
+  !mobileSectionButton ||
+  !drawerBackdrop ||
+  !drawerCloseButton
 ) {
   throw new Error('必要なDOM要素を作成できませんでした');
 }
@@ -78,6 +99,43 @@ const presentationChannel =
 if (isPresentationWindow) {
   document.body.classList.add('presentation-window');
 }
+
+const openMobileDrawer = (focusSection = false) => {
+  document.body.classList.add('drawer-open');
+  sidePanel.setAttribute('aria-hidden', 'false');
+
+  if (focusSection) {
+    window.setTimeout(() => {
+      sidePanel.scrollTo({
+        top: Math.max(sectionPanel.offsetTop - 54, 0),
+        behavior: 'smooth',
+      });
+    }, 60);
+  } else {
+    sidePanel.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
+
+const closeMobileDrawer = () => {
+  document.body.classList.remove('drawer-open');
+  sidePanel.setAttribute('aria-hidden', 'true');
+};
+
+mobileMenuButton.addEventListener('click', () => openMobileDrawer(false));
+mobileSectionButton.addEventListener('click', () => openMobileDrawer(true));
+drawerBackdrop.addEventListener('click', closeMobileDrawer);
+drawerCloseButton.addEventListener('click', closeMobileDrawer);
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeMobileDrawer();
+  }
+});
+
+window.matchMedia('(max-width: 680px)').addEventListener('change', (event) => {
+  if (!event.matches) {
+    closeMobileDrawer();
+  }
+});
 
 const slicerState = createInitialSlicerState();
 slicerState.offset = readNumber(urlParams.get('offset'), slicerState.offset);
