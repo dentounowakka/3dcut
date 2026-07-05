@@ -46,3 +46,14 @@ npm run dev
 - プレゼン用ウィンドウには操作パネルを表示せず、3D図形と断面図だけを表示します。
 - 通常の操作画面で図形、内側図形、切断位置、切断角度を変えると、プレゼン用ウィンドウにも反映されます。
 - 「消す側」から、切断平面のどちら側を非表示にするかを切り替えられます。
+
+## GitHub Pages で公開する方法
+
+1. GitHub で新しいリポジトリを作成します。
+2. このプロジェクトを `main` ブランチに push します。
+3. GitHub のリポジトリ画面で `Settings` → `Pages` を開きます。
+4. `Build and deployment` の `Source` を `GitHub Actions` にします。
+5. `Actions` タブで `Deploy to GitHub Pages` が成功するまで待ちます。
+6. 成功後、`https://ユーザー名.github.io/リポジトリ名/` で開けます。
+
+`index.html` を直接開くのではなく、ローカルでは `npm run dev`、公開時は GitHub Pages や Vercel などのWebサーバー上で開いてください。
